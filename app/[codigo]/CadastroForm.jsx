@@ -20,7 +20,7 @@ export default function CadastroForm({ codigo, pulseiraId }) {
         telefone: telefone,
         cadastrada: true,
       })
-      .eq('id', pulseiraId)
+      .eq('codigo', codigo)
 
     if (error) {
       setErro('Erro ao salvar. Tente novamente.')
