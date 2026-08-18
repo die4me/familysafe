@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-export default function CadastroForm({ codigo, pulseiraId }) {
+export default function CadastroForm({ codigo }) {
   const [nome, setNome] = useState('')
   const [responsavel, setResponsavel] = useState('')
   const [telefone, setTelefone] = useState('')
@@ -15,21 +15,19 @@ export default function CadastroForm({ codigo, pulseiraId }) {
     setErro('')
     const { data, error } = await supabase
       .from('pulseiras')
-      .update({
-        nome_crianca: nome,
-        nome_responsavel: responsavel,
-        telefone: telefone,
-        cadastrada: true,
-      })
-      .eq('codigo', codigo)
+      .upsert(
+        {
+          codigo: codigo,
+          nome_crianca: nome,
+          nome_responsavel: responsavel,
+          telefone: telefone,
+          cadastrada: true,
+        },
+        { onConflict: 'codigo' }
+      )
 
     if (error) {
       setErro('ERRO: ' + error.message)
-      return
-    }
-
-    if (!data || data.length === 0) {
-      setErro('ERRO: não encontrei a pulseira ' + codigo + ' para salvar.')
       return
     }
 
