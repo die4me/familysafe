@@ -22,7 +22,7 @@ export default async function PulseiraPage({ params }) {
     )
   }
 
-  if (!pulseira.cadastrada) {
+  if (!pulseira.nome_crianca) {
     return <CadastroForm codigo={codigo} pulseiraId={pulseira.id} />
   }
 
