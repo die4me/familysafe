@@ -1,17 +1,36 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import CadastroForm from './CadastroForm'
 import DadosPulseira from './DadosPulseira'
 
-export const dynamic = 'force-dynamic'
-
-export default async function PulseiraPage({ params }) {
+export default function PulseiraPage({ params }) {
   const codigo = params.codigo
+  const [pulseira, setPulseira] = useState(null)
+  const [carregando, setCarregando] = useState(true)
 
-  const { data: pulseira } = await supabase
-    .from('pulseiras')
-    .select('*')
-    .eq('codigo', codigo)
-    .maybeSingle()
+  useEffect(() => {
+    async function buscar() {
+      const { data } = await supabase
+        .from('pulseiras')
+        .select('*')
+        .eq('codigo', codigo)
+        .maybeSingle()
+      setPulseira(data)
+      setCarregando(false)
+    }
+    buscar()
+  }, [codigo])
+
+  if (carregando) {
+    return (
+      <main className="card">
+        <h1>🛡️ JMCS Family Safe</h1>
+        <p>Carregando...</p>
+      </main>
+    )
+  }
 
   if (!pulseira) {
     return (
@@ -23,7 +42,7 @@ export default async function PulseiraPage({ params }) {
   }
 
   if (!pulseira.nome_crianca) {
-    return <CadastroForm codigo={codigo} pulseiraId={pulseira.id} />
+    return <CadastroForm codigo={codigo} />
   }
 
   return <DadosPulseira pulseira={pulseira} />
