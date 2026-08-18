@@ -12,7 +12,8 @@ export default function CadastroForm({ codigo, pulseiraId }) {
 
   async function salvar(e) {
     e.preventDefault()
-    const { error } = await supabase
+    setErro('')
+    const { data, error } = await supabase
       .from('pulseiras')
       .update({
         nome_crianca: nome,
@@ -23,9 +24,15 @@ export default function CadastroForm({ codigo, pulseiraId }) {
       .eq('codigo', codigo)
 
     if (error) {
-      setErro('Erro ao salvar. Tente novamente.')
+      setErro('ERRO: ' + error.message)
       return
     }
+
+    if (!data || data.length === 0) {
+      setErro('ERRO: não encontrei a pulseira ' + codigo + ' para salvar.')
+      return
+    }
+
     setSalvo(true)
   }
 
@@ -58,7 +65,7 @@ export default function CadastroForm({ codigo, pulseiraId }) {
           <input value={telefone} onChange={(e) => setTelefone(e.target.value)} required type="tel" />
         </label>
         <button type="submit">Cadastrar</button>
-        {erro && <p className="erro">{erro}</p>}
+        {erro && <p style={{ color: 'red', fontWeight: 'bold' }}>{erro}</p>}
       </form>
     </main>
   )
